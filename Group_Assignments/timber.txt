@@ -1,0 +1,155 @@
+SQL> alter table table_name
+  2    RENAME to new_table;
+alter table table_name
+*
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> -- Drop tables in reverse order with CASCADE CONSTRAINTS option
+SQL> drop table orders cascade constraints;
+drop table orders cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table product_review cascade constraints;
+drop table product_review cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table product cascade constraints;
+drop table product cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table supplier cascade constraints;
+
+Table dropped.
+
+SQL> drop table customer cascade constraints;
+drop table customer cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table category cascade constraints;
+
+Table dropped.
+
+SQL> drop table sub_category cascade constraints;
+
+Table dropped.
+
+SQL> 
+SQL> -- Create tables
+SQL> CREATE TABLE customer (
+  2  	 customer# number constraint sys_tim_customer_pk primary key,
+  3  	 customer_address varchar2(50) not null,
+  4  	 customer_city varchar2(50) not null,
+  5  	 customer_prov char(2) not null constraint sys_customer_prov_ck check (customer_prov in ('BC','AB','SK','MB','ON','QC','NB','NS','NL','NT','NU','PE','YT')),
+  6  	 postalCode char(6) not null constraint sys_customer_postal_ck check (regexp_like (postalCode, '[A-Z][0-9][A-Z][0-9][A-Z][0-9]')),
+  7  	 phoneNumber number(14) not null constraint sys_customer_phone_ck2 check (regexp_like (phoneNumber, '[0-9]{3}-[0-9]{3}-[0-9]{4}')),
+  8  	 customer_emailAddress varchar2(50) not null,
+  9  	 IsTimberMember char(1) not null constraint sys_customer_timber_ck check (IsTimberMember in ('Y', 'N'))
+ 10  );
+    phoneNumber number(14) not null constraint sys_customer_phone_ck2 check (regexp_like (phoneNumber, '[0-9]{3}-[0-9]{3}-[0-9]{4}')),
+                                               *
+ERROR at line 7:
+ORA-02264: name already used by an existing constraint 
+
+
+SQL> 
+SQL> CREATE TABLE supplier (
+  2  	 supplier# number constraint sys_supplier_pk primary key,
+  3  	 supplierName varchar2(50) not null,
+  4  	 supplier_emailAddress varchar2(50) not null,
+  5  	 supplier_city varchar2(50) not null,
+  6  	 supplier_prov char(2) not null constraint sys_supplier_prov_ck check (supplier_prov in ('BC','AB','SK','MB','ON','QC','NB','NS','NL','NT','NU','PE','YT')),
+  7  	 quantity_on_hand number not null constraint sys_supplier_on_hand_ck check (quantity_on_hand >= 0),
+  8  	 estimated_delivery number not null constraint sys_supplier_estimated_delivery_ck check (estimated_delivery >= 0)
+  9  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE sub_category (
+  2  	 sub_category_num number constraint sys_sub_category_pk primary key
+  3  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE category (
+  2  	 sub_category_num number,
+  3  	 category_num number,
+  4  	 categoryName varchar2(15) not null,
+  5  	 constraint sys_category_pk primary key (category_num, sub_category_num),
+  6  	 constraint sys_category_fk foreign key (sub_category_num) references sub_category(sub_category_num)
+  7  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE product (
+  2  	 product# number constraint sys_product_pk primary key,
+  3  	 title varchar2(30) not null,
+  4  	 product_description varchar2(255) not null,
+  5  	 price number(10, 2) not null constraint sys_product_price_ck check (price > 0),
+  6  	 weight_kg number not null constraint sys_product_weight_ck check (weight_kg > 0),
+  7  	 IsTaxExempt char(1) not null constraint sys_product_tax_ck check (IsTaxExempt in ('Y', 'N')),
+  8  	 category# number not null,
+  9  	 constraint sys_product_fk foreign key (category#) references category(category_num)
+ 10  );
+    constraint sys_product_fk foreign key (category#) references category(category_num)
+                                                                          *
+ERROR at line 9:
+ORA-02270: no matching unique or primary key for this column-list 
+
+
+SQL> 
+SQL> CREATE TABLE product_review (
+  2  	 Review# INT PRIMARY KEY,
+  3  	 Rating INT NOT NULL,
+  4  	 Comment VARCHAR(255) NOT NULL,
+  5  	 Product# INT NOT NULL,
+  6  	 ReviewDate DATE NOT NULL,
+  7  	 CHECK (Rating >= 1 AND Rating <= 5),
+  8  	 FOREIGN KEY (Product#) REFERENCES Product (Product#)
+  9  );
+    Comment VARCHAR(255) NOT NULL,
+    *
+ERROR at line 4:
+ORA-00904: : invalid identifier 
+
+
+SQL> 
+SQL> CREATE TABLE orders(
+  2  Order# INT PRIMARY KEY,
+  3  OrderDate DATE NOT NULL
+  4  customer# number not null,
+  5  constraint sys_orders_fk1 foreign key (customer#)
+  6  references customer(customer#),
+  7  product# number not null,
+  8  constraint sys_orders_fk2 foreign key (product#)
+  9  references product(product#),
+ 10  supplier# number not null,
+ 11  constraint sys_orders_fk3 foreign key (supplier#)
+ 12  references supplier(supplier#),
+ 13  order_qty number not null,
+ 14  order_total number(10, 2) not null
+ 15  );
+customer# number not null,
+*
+ERROR at line 4:
+ORA-00907: missing right parenthesis 
+
+
+SQL> 
+SQL> spool off;

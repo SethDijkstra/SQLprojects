@@ -1,0 +1,109 @@
+SQL> 
+SQL> rem Q1 - basic select columns with headers
+SQL> 
+SQL> select Title "Title", upper(PubDate) "Pub Date", Category "Category", Retail "Retail Price"
+  2  from books
+  3  where upper(category) in 'COMPUTER' and retail < 30 or PubDate > '31-dec-05'
+  4  order by PubDate;
+
+Title                          Pub Date           Category     Retail Price                                                                           
+------------------------------ ------------------ ------------ ------------                                                                           
+HANDCRANKED COMPUTERS          21-JAN-05          COMPUTER               25                                                                           
+E-BUSINESS THE EASY WAY        01-MAR-06          COMPUTER             54.5                                                                           
+BUILDING A CAR WITH TOOTHPICKS 18-MAR-06          CHILDREN            59.95                                                                           
+HOW TO GET FASTER PIZZA        11-NOV-06          SELF HELP           29.95                                                                           
+
+SQL> 
+SQL> rem Q2
+SQL> 
+SQL> select order# "Order #", customer# "Customer #", orderdate "Date Ord"
+  2  from orders
+  3  where shipdate is null
+  4  order by customer#, order#;
+
+   Order # Customer # Date Ord                                                                                                                        
+---------- ---------- ---------                                                                                                                       
+      1018       1001 05-APR-09                                                                                                                       
+      1016       1003 04-APR-09                                                                                                                       
+      1020       1008 05-APR-09                                                                                                                       
+      1012       1017 03-APR-09                                                                                                                       
+      1019       1018 05-APR-09                                                                                                                       
+      1015       1020 04-APR-09                                                                                                                       
+
+6 rows selected.
+
+SQL> 
+SQL> rem Q3
+SQL> 
+SQL> select order#, shipdate, ShipState "SH"
+  2  from orders
+  3  where shipdate between '01-APR-09' and '03-APR-09' and shipstate != 'WA'
+  4  order by shipdate;
+
+    ORDER# SHIPDATE  SH                                                                                                                               
+---------- --------- --                                                                                                                               
+      1001 01-APR-09 GA                                                                                                                               
+      1002 01-APR-09 IL                                                                                                                               
+      1003 01-APR-09 FL                                                                                                                               
+      1005 02-APR-09 GA                                                                                                                               
+      1006 02-APR-09 FL                                                                                                                               
+      1008 03-APR-09 ID                                                                                                                               
+
+6 rows selected.
+
+SQL> 
+SQL> 
+SQL> rem Q4
+SQL> 
+SQL> select title, pubid, retail
+  2  from books
+  3  where pubid in ('2', '3', '4') or retail < 30
+  4  order by title;
+
+TITLE                               PUBID     RETAIL                                                                                                  
+------------------------------ ---------- ----------                                                                                                  
+BIG BEAR AND LITTLE DOVE                5       8.95                                                                                                  
+BODYBUILD IN 10 MINUTES A DAY           4      30.95                                                                                                  
+BUILDING A CAR WITH TOOTHPICKS          2      59.95                                                                                                  
+COOKING WITH MUSHROOMS                  4      19.95                                                                                                  
+DATABASE IMPLEMENTATION                 3      55.95                                                                                                  
+E-BUSINESS THE EASY WAY                 2       54.5                                                                                                  
+HANDCRANKED COMPUTERS                   3         25                                                                                                  
+HOLY GRAIL OF ORACLE                    3      75.95                                                                                                  
+HOW TO GET FASTER PIZZA                 4      29.95                                                                                                  
+REVENGE OF MICKEY                       1         22                                                                                                  
+THE WOK WAY TO COOK                     4      28.75                                                                                                  
+
+11 rows selected.
+
+SQL> 
+SQL> rem Q5
+SQL> 
+SQL> select customer#, Address, Referred, Email
+  2  from Customers
+  3  where Referred = 1003 or Address like 'P.O.%' or Email like '%axe.com'
+  4  order by customer#;
+
+ CUSTOMER# ADDRESS                REFERRED EMAIL                                                                                                      
+---------- -------------------- ---------- ------------------------------                                                                             
+      1001 P.O. BOX 651                    bm225@sat.net                                                                                              
+      1002 P.O. BOX 9835                                                                                                                              
+      1003 P.O. BOX 66                                                                                                                                
+      1005 P.O. BOX 851                    cing101@zep.net                                                                                            
+      1006 82 DIRT ROAD                    cruztop@axe.com                                                                                            
+      1007 9153 MAIN STREET           1003 treetop@zep.net                                                                                            
+      1008 P.O. BOX 137                    kenask@sat.net                                                                                             
+      1009 P.O. BOX 8564              1003 jperez@canet.com                                                                                           
+      1011 P.O. BOX 18                     reesemc@sat.net                                                                                            
+      1012 P.O. BOX 971                    will2244@axe.net                                                                                           
+      1014 P.O. BOX 2947                   jaslee@sat.net                                                                                             
+      1015 P.O. BOX 677                    sschell3@sat.net                                                                                           
+      1017 P.O. BOX 563                    becca88@digs.com                                                                                           
+      1019 P.O. BOX 1151              1003                                                                                                            
+      1020 P.O. BOX 335                    Kfalah@sat.net                                                                                             
+
+15 rows selected.
+
+SQL> 
+SQL> 
+SQL> spool off

@@ -1,0 +1,77 @@
+SQL> 
+SQL> select initcap(fname) || ' ' || initcap(lname) "Author Name",
+  2         to_char(sum(quantity*paideach), '$99,999.00') "Value",
+  3         to_char(sum(quantity*paideach*0.01), '$99,990.00') "Commision"
+  4  from author join bookauthor using(authorid)
+  5       join books using(isbn)
+  6       join orderitems using(isbn)
+  7  group by fname, lname
+  8  order by fname, lname;
+
+Author Name           Value       Commision                                                                             
+--------------------- ----------- -----------                                                                           
+Jack Baker                $672.30       $6.72                                                                           
+James Austin              $608.10       $6.08                                                                           
+Janice Jones              $219.00       $2.19                                                                           
+Juan Adams                $391.65       $3.92                                                                           
+Lisa Porter                $30.95       $0.31                                                                           
+Lisa White                 $89.95       $0.90                                                                           
+Oscar Fields              $512.70       $5.13                                                                           
+Robert Robinson           $548.50       $5.49                                                                           
+Sam Smith                  $30.95       $0.31                                                                           
+Tina Peterson             $391.65       $3.92                                                                           
+William White              $81.95       $0.82                                                                           
+
+11 rows selected.
+
+SQL> 
+SQL> 
+SQL> select initcap(firstname) "First", initcap(lastname)"Last",
+  2      count(distinct authorid)"Number Authors"
+  3  from customers join orders using(customer#)
+  4      join orderitems using(order#)
+  5      join books using(isbn)
+  6      join bookauthor using(isbn)
+  7  group by firstname, lastname
+  8  having count(distinct authorid) >= 2
+  9  order by 2,1;
+
+First      Last       Number Authors                                                                                    
+---------- ---------- --------------                                                                                    
+Kenneth    Falah                   3                                                                                    
+Tammy      Giana                   5                                                                                    
+Cindy      Girard                  2                                                                                    
+Jasmine    Lee                     3                                                                                    
+Jake       Lucas                   4                                                                                    
+Reese      Mcgovern                3                                                                                    
+Greg       Montiasa                2                                                                                    
+Bonita     Morales                 6                                                                                    
+Becca      Nelson                  6                                                                                    
+Jennifer   Smith                   3                                                                                    
+Leila      Smith                   4                                                                                    
+
+11 rows selected.
+
+SQL> 
+SQL> select name,
+  2      to_char(avg(retail-cost), '$99,900.00') "Avg Profit"
+  3  from publisher join books using(pubid)
+  4  group by name
+  5  order by name;
+
+NAME                    Avg Profit                                                                                      
+----------------------- -----------                                                                                     
+AMERICAN PUBLISHING          $18.82                                                                                     
+PRINTING IS US               $12.18                                                                                     
+PUBLISH OUR WAY              $19.38                                                                                     
+READING MATERIALS INC.       $10.38                                                                                     
+REED-N-RITE                  $21.23                                                                                     
+
+SQL> 
+SQL> spool offset echo on
+SP2-0768: Illegal SPOOL command
+Usage: SPOOL { <file> | OFF | OUT }
+where <file> is file_name[.ext] [CRE[ATE]|REP[LACE]|APP[END]]
+SQL> set linesize 150
+SQL> set pagesize 66
+SQL> spool C:\cprg250s\joining.txt

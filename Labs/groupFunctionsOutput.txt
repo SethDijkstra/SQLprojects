@@ -1,0 +1,47 @@
+SQL> 
+SQL> 
+SQL> column 'Tour' format A30
+SQL> select tour_description "Tour",
+  2  	    count(dest_code) "# of destinations",
+  3  	    to_char(sum(price),'$9,999.00') "Total"
+  4  from rcv_vacation_tour join rcv_tour_destination using(tour_code)
+  5  	  join rcv_destination using(dest_code)
+  6  group by tour_description
+  7  having count(dest_code) > 3;
+
+Tour                           # of destinations Total                                                                  
+------------------------------ ----------------- ----------                                                             
+Paris Highlights                               4    $370.63                                                             
+France in 4 Days                               4    $748.41                                                             
+European Vacation                              5  $1,299.47                                                             
+Paris Culture Tour                             4    $792.90                                                             
+Sights of Barcelona                            4    $917.43                                                             
+Palm Springs Adventure                         4  $1,390.45                                                             
+Palm Springs Highlights                        4    $336.17                                                             
+Calgary Adventure                              4    $467.87                                                             
+Rocky Mountain Experience                      5  $1,100.60                                                             
+
+9 rows selected.
+
+SQL> 
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> select sum(price) "Total for all customers"
+  2  from rcv_destination join rcv_tour_destination using(dest_code)
+  3  	  join rcv_vacation_tour using(tour_code)
+  4  	  join rcv_tour_customer using(tour_code)
+  5  where tour_code is not null;
+
+Total for all customers                                                                                                 
+-----------------------                                                                                                 
+               13651.79                                                                                                 
+
+SQL> 
+SQL> --select customer_number, sum(price)
+SQL> --from rcv_destination join rcv_tour_destination using(dest_code)
+SQL>  --    join rcv_vacation_tour using(tour_code)
+SQL>  --    join rcv_tour_customer using(tour_code)
+SQL> --group by customer_number;
+SQL> 
+SQL> spool off

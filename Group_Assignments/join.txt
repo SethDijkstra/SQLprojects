@@ -1,0 +1,121 @@
+SQL> 
+SQL> rem Q1
+SQL> 
+SQL> select authorid "AUTH", fName, Lname
+  2  from author
+  3  except
+  4  select authorid "AUTH", fName, Lname
+  5  from author natural join bookauthor natural join books natural join orderitems;
+
+AUTH FNAME      LNAME                                                                                                                                 
+---- ---------- ----------                                                                                                                            
+M100 SHEILA     MARTINEZ                                                                                                                              
+W110 ANTHONY    WILKINSON                                                                                                                             
+K100 TAMARA     KZOCHSKY                                                                                                                              
+
+3 rows selected.
+
+SQL> 
+SQL> rem Q2
+SQL> 
+SQL> select order#, item#, title, quantity, paideach, quantity * paideach as "Item Total", gift
+  2  from orderitems oi, books b, promotion p
+  3  where oi.isbn = b.isbn and oi.quantity * oi.paideach between p.Minretail and p.Maxretail
+  4  order by order#;
+
+    ORDER#      ITEM# TITLE                            QUANTITY   PAIDEACH Item Total GIFT                                                            
+---------- ---------- ------------------------------ ---------- ---------- ---------- ---------------                                                 
+      1000          1 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+      1001          1 HOW TO MANAGE THE MANAGER               1      31.95      31.95 BOOK COVER                                                      
+      1001          2 PAINLESS CHILD-REARING                  1      85.45      85.45 FREE SHIPPING                                                   
+      1002          1 DATABASE IMPLEMENTATION                 2      55.95      111.9 FREE SHIPPING                                                   
+      1003          3 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+      1003          1 DATABASE IMPLEMENTATION                 1      55.95      55.95 BOOK COVER                                                      
+      1003          2 BODYBUILD IN 10 MINUTES A DAY           1      30.95      30.95 BOOK COVER                                                      
+      1004          1 PAINLESS CHILD-REARING                  2      85.45      170.9 FREE SHIPPING                                                   
+      1005          1 SHORTEST POEMS                          1      39.95      39.95 BOOK COVER                                                      
+      1006          1 E-BUSINESS THE EASY WAY                 1       54.5       54.5 BOOK COVER                                                      
+      1007          4 DATABASE IMPLEMENTATION                 1      55.95      55.95 BOOK COVER                                                      
+      1007          1 HOLY GRAIL OF ORACLE                    3      72.15     216.45 FREE SHIPPING                                                   
+      1007          3 BIG BEAR AND LITTLE DOVE                1       8.95       8.95 BOOKMARKER                                                      
+      1007          2 E-BUSINESS THE EASY WAY                 1       54.5       54.5 BOOK COVER                                                      
+      1008          1 COOKING WITH MUSHROOMS                  2      19.95       39.9 BOOK COVER                                                      
+      1009          2 REVENGE OF MICKEY                       1         22         22 BOOK LABELS                                                     
+      1009          1 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+      1010          1 DATABASE IMPLEMENTATION                 1      55.95      55.95 BOOK COVER                                                      
+      1011          1 PAINLESS CHILD-REARING                  1      85.45      85.45 FREE SHIPPING                                                   
+      1012          2 HANDCRANKED COMPUTERS                   2         25         50 BOOK COVER                                                      
+      1012          4 REVENGE OF MICKEY                       1         22         22 BOOK LABELS                                                     
+      1012          1 BIG BEAR AND LITTLE DOVE                1       8.95       8.95 BOOKMARKER                                                      
+      1012          3 PAINLESS CHILD-REARING                  1      85.45      85.45 FREE SHIPPING                                                   
+      1013          1 DATABASE IMPLEMENTATION                 1      55.95      55.95 BOOK COVER                                                      
+      1014          1 REVENGE OF MICKEY                       2         22         44 BOOK COVER                                                      
+      1015          1 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+      1016          1 PAINLESS CHILD-REARING                  1      85.45      85.45 FREE SHIPPING                                                   
+      1017          1 BIG BEAR AND LITTLE DOVE                2       8.95       17.9 BOOK LABELS                                                     
+      1018          1 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+      1018          2 DATABASE IMPLEMENTATION                 1      55.95      55.95 BOOK COVER                                                      
+      1019          1 REVENGE OF MICKEY                       1         22         22 BOOK LABELS                                                     
+      1020          1 COOKING WITH MUSHROOMS                  1      19.95      19.95 BOOK LABELS                                                     
+
+32 rows selected.
+
+SQL> 
+SQL> rem Q3
+SQL> 
+SQL> select customer#, FirstName, LastName, title
+  2  from customers full outer join orders using (customer#)
+  3  	 left join orderitems using (order#)
+  4  	 right outer join books using (isbn)
+  5  order by 3,2,4;
+
+ CUSTOMER# FIRSTNAME  LASTNAME   TITLE                                                                                                                
+---------- ---------- ---------- ------------------------------                                                                                       
+      1020 KENNETH    FALAH      COOKING WITH MUSHROOMS                                                                                               
+      1020 KENNETH    FALAH      PAINLESS CHILD-REARING                                                                                               
+      1007 TAMMY      GIANA      BIG BEAR AND LITTLE DOVE                                                                                             
+      1007 TAMMY      GIANA      DATABASE IMPLEMENTATION                                                                                              
+      1007 TAMMY      GIANA      E-BUSINESS THE EASY WAY                                                                                              
+      1007 TAMMY      GIANA      HOLY GRAIL OF ORACLE                                                                                                 
+      1007 TAMMY      GIANA      REVENGE OF MICKEY                                                                                                    
+      1005 CINDY      GIRARD     COOKING WITH MUSHROOMS                                                                                               
+      1005 CINDY      GIRARD     COOKING WITH MUSHROOMS                                                                                               
+      1005 CINDY      GIRARD     REVENGE OF MICKEY                                                                                                    
+      1008 KENNETH    JONES      COOKING WITH MUSHROOMS                                                                                               
+      1014 JASMINE    LEE        DATABASE IMPLEMENTATION                                                                                              
+      1010 JAKE       LUCAS      HOW TO MANAGE THE MANAGER                                                                                            
+      1010 JAKE       LUCAS      PAINLESS CHILD-REARING                                                                                               
+      1010 JAKE       LUCAS      PAINLESS CHILD-REARING                                                                                               
+      1011 REESE      MCGOVERN   DATABASE IMPLEMENTATION                                                                                              
+      1018 GREG       MONTIASA   REVENGE OF MICKEY                                                                                                    
+      1018 GREG       MONTIASA   SHORTEST POEMS                                                                                                       
+      1001 BONITA     MORALES    BODYBUILD IN 10 MINUTES A DAY                                                                                        
+      1001 BONITA     MORALES    COOKING WITH MUSHROOMS                                                                                               
+      1001 BONITA     MORALES    COOKING WITH MUSHROOMS                                                                                               
+      1001 BONITA     MORALES    DATABASE IMPLEMENTATION                                                                                              
+      1001 BONITA     MORALES    DATABASE IMPLEMENTATION                                                                                              
+      1017 BECCA      NELSON     BIG BEAR AND LITTLE DOVE                                                                                             
+      1017 BECCA      NELSON     HANDCRANKED COMPUTERS                                                                                                
+      1017 BECCA      NELSON     PAINLESS CHILD-REARING                                                                                               
+      1017 BECCA      NELSON     REVENGE OF MICKEY                                                                                                    
+      1004 THOMAS     PIERSON    COOKING WITH MUSHROOMS                                                                                               
+      1015 STEVE      SCHELL     BIG BEAR AND LITTLE DOVE                                                                                             
+      1019 JENNIFER   SMITH      DATABASE IMPLEMENTATION                                                                                              
+      1003 LEILA      SMITH      E-BUSINESS THE EASY WAY                                                                                              
+      1003 LEILA      SMITH      PAINLESS CHILD-REARING                                                                                               
+                                 BUILDING A CAR WITH TOOTHPICKS                                                                                       
+                                 HOW TO GET FASTER PIZZA                                                                                              
+                                 THE WOK WAY TO COOK                                                                                                  
+
+35 rows selected.
+
+SQL> 
+SQL> rem Q4
+SQL> 
+SQL> 
+SQL> 
+SQL> rem Q5
+SQL> 
+SQL> 
+SQL> 
+SQL> spool off

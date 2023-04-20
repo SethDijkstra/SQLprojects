@@ -1,0 +1,167 @@
+SQL> 
+SQL> rem Q1 - basic select columns with headers
+SQL> 
+SQL> select Fname "First", Lname "Last"
+  2  from author;
+
+First      Last                                                                                                                                       
+---------- ----------                                                                                                                                 
+SAM        SMITH                                                                                                                                      
+JANICE     JONES                                                                                                                                      
+JAMES      AUSTIN                                                                                                                                     
+SHEILA     MARTINEZ                                                                                                                                   
+TAMARA     KZOCHSKY                                                                                                                                   
+LISA       PORTER                                                                                                                                     
+JUAN       ADAMS                                                                                                                                      
+JACK       BAKER                                                                                                                                      
+TINA       PETERSON                                                                                                                                   
+WILLIAM    WHITE                                                                                                                                      
+LISA       WHITE                                                                                                                                      
+ROBERT     ROBINSON                                                                                                                                   
+OSCAR      FIELDS                                                                                                                                     
+ANTHONY    WILKINSON                                                                                                                                  
+
+14 rows selected.
+
+SQL> 
+SQL> rem Q2
+SQL> select order# ||'-'||item# AS "Order-Item #",
+  2  isbn AS "Book ISBN",
+  3  quantity AS "Qty",
+  4  PaidEach AS "Price",
+  5  quantity * PaidEach AS "Line Total",
+  6  quantity * PaidEach * 0.05 AS "GST",
+  7  round((quantity * PaidEach) * 1.05, 2) AS "Total Price"
+  8  from orderitems
+  9  order by item#;
+
+Order-Item #                                                                      Book ISBN         Qty      Price Line Total        GST Total Price  
+--------------------------------------------------------------------------------- ---------- ---------- ---------- ---------- ---------- -----------  
+1000-1                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1020-1                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1001-1                                                                            9247381001          1      31.95      31.95     1.5975       33.55  
+1019-1                                                                            0401140733          1         22         22        1.1        23.1  
+1018-1                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1017-1                                                                            8117949391          2       8.95       17.9       .895        18.8  
+1016-1                                                                            2491748320          1      85.45      85.45     4.2725       89.72  
+1015-1                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1014-1                                                                            0401140733          2         22         44        2.2        46.2  
+1013-1                                                                            8843172113          1      55.95      55.95     2.7975       58.75  
+1012-1                                                                            8117949391          1       8.95       8.95      .4475         9.4  
+1011-1                                                                            2491748320          1      85.45      85.45     4.2725       89.72  
+1010-1                                                                            8843172113          1      55.95      55.95     2.7975       58.75  
+1002-1                                                                            8843172113          2      55.95      111.9      5.595       117.5  
+1003-1                                                                            8843172113          1      55.95      55.95     2.7975       58.75  
+1004-1                                                                            2491748320          2      85.45      170.9      8.545      179.45  
+1005-1                                                                            2147428890          1      39.95      39.95     1.9975       41.95  
+1006-1                                                                            9959789321          1       54.5       54.5      2.725       57.23  
+1007-1                                                                            3957136468          3      72.15     216.45    10.8225      227.27  
+1008-1                                                                            3437212490          2      19.95       39.9      1.995        41.9  
+1009-1                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1012-2                                                                            1915762492          2         25         50        2.5        52.5  
+1018-2                                                                            8843172113          1      55.95      55.95     2.7975       58.75  
+1003-2                                                                            1059831198          1      30.95      30.95     1.5475        32.5  
+1001-2                                                                            2491748320          1      85.45      85.45     4.2725       89.72  
+1009-2                                                                            0401140733          1         22         22        1.1        23.1  
+1007-2                                                                            9959789321          1       54.5       54.5      2.725       57.23  
+1003-3                                                                            3437212490          1      19.95      19.95      .9975       20.95  
+1012-3                                                                            2491748320          1      85.45      85.45     4.2725       89.72  
+1007-3                                                                            8117949391          1       8.95       8.95      .4475         9.4  
+1012-4                                                                            0401140733          1         22         22        1.1        23.1  
+1007-4                                                                            8843172113          1      55.95      55.95     2.7975       58.75  
+
+32 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> rem Q3
+SQL> 
+SQL> select unique authorid
+  2  from bookauthor
+  3  order by authorid;
+
+AUTH                                                                                                                                                  
+----                                                                                                                                                  
+A100                                                                                                                                                  
+A105                                                                                                                                                  
+B100                                                                                                                                                  
+F100                                                                                                                                                  
+J100                                                                                                                                                  
+K100                                                                                                                                                  
+P100                                                                                                                                                  
+P105                                                                                                                                                  
+R100                                                                                                                                                  
+S100                                                                                                                                                  
+W100                                                                                                                                                  
+W105                                                                                                                                                  
+
+12 rows selected.
+
+SQL> 
+SQL> rem Q4
+SQL> 
+SQL> select customer# || '-' || order# "Cust#-Order#",
+  2  ShipDate - OrderDate "Days to Ship"
+  3  from orders;
+
+Cust#-Order#                                                                      Days to Ship                                                        
+--------------------------------------------------------------------------------- ------------                                                        
+1005-1000                                                                                    2                                                        
+1010-1001                                                                                    1                                                        
+1011-1002                                                                                    1                                                        
+1001-1003                                                                                    0                                                        
+1020-1004                                                                                    4                                                        
+1018-1005                                                                                    1                                                        
+1003-1006                                                                                    1                                                        
+1007-1007                                                                                    2                                                        
+1004-1008                                                                                    1                                                        
+1005-1009                                                                                    2                                                        
+1019-1010                                                                                    1                                                        
+1010-1011                                                                                    2                                                        
+1017-1012                                                                                                                                             
+1014-1013                                                                                    1                                                        
+1007-1014                                                                                    1                                                        
+1020-1015                                                                                                                                             
+1003-1016                                                                                                                                             
+1015-1017                                                                                    1                                                        
+1001-1018                                                                                                                                             
+1018-1019                                                                                                                                             
+1008-1020                                                                                                                                             
+
+21 rows selected.
+
+SQL> 
+SQL> rem Q5
+SQL> 
+SQL> select firstname || ', ' || lastname as "Name",
+  2  address || ', ' || City || ', ' || state || ', ' || zip
+  3  from customers;
+
+Name                   ADDRESS||','||CITY||','||STATE||','||ZIP                                                                                       
+---------------------- ---------------------------------------------                                                                                  
+BONITA, MORALES        P.O. BOX 651, EASTPOINT, FL, 32328                                                                                             
+RYAN, THOMPSON         P.O. BOX 9835, SANTA MONICA, CA, 90404                                                                                         
+LEILA, SMITH           P.O. BOX 66, TALLAHASSEE, FL, 32306                                                                                            
+THOMAS, PIERSON        69821 SOUTH AVENUE, BOISE, ID, 83707                                                                                           
+CINDY, GIRARD          P.O. BOX 851, SEATTLE, WA, 98115                                                                                               
+MESHIA, CRUZ           82 DIRT ROAD, ALBANY, NY, 12211                                                                                                
+TAMMY, GIANA           9153 MAIN STREET, AUSTIN, TX, 78710                                                                                            
+KENNETH, JONES         P.O. BOX 137, CHEYENNE, WY, 82003                                                                                              
+JORGE, PEREZ           P.O. BOX 8564, BURBANK, CA, 91510                                                                                              
+JAKE, LUCAS            114 EAST SAVANNAH, ATLANTA, GA, 30314                                                                                          
+REESE, MCGOVERN        P.O. BOX 18, CHICAGO, IL, 60606                                                                                                
+WILLIAM, MCKENZIE      P.O. BOX 971, BOSTON, MA, 02110                                                                                                
+NICHOLAS, NGUYEN       357 WHITE EAGLE AVE., CLERMONT, FL, 34711                                                                                      
+JASMINE, LEE           P.O. BOX 2947, CODY, WY, 82414                                                                                                 
+STEVE, SCHELL          P.O. BOX 677, MIAMI, FL, 33111                                                                                                 
+MICHELL, DAUM          9851231 LONG ROAD, BURBANK, CA, 91508                                                                                          
+BECCA, NELSON          P.O. BOX 563, KALMAZOO, MI, 49006                                                                                              
+GREG, MONTIASA         1008 GRAND AVENUE, MACON, GA, 31206                                                                                            
+JENNIFER, SMITH        P.O. BOX 1151, MORRISTOWN, NJ, 07962                                                                                           
+KENNETH, FALAH         P.O. BOX 335, TRENTON, NJ, 08607                                                                                               
+
+20 rows selected.
+
+SQL> 
+SQL> spool off

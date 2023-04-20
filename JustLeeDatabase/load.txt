@@ -1,0 +1,191 @@
+SQL> 
+SQL> --delete existing data from tables, children followed by parents
+SQL> 
+SQL> delete ghc_expertise;
+
+0 rows deleted.
+
+SQL> delete ghc_course;
+
+3 rows deleted.
+
+SQL> delete ghc_faculty;
+
+0 rows deleted.
+
+SQL> delete ghc_department;
+
+1 row deleted.
+
+SQL> 
+SQL> insert into ghc_department (dept_no, dept_name)
+  2  	 values (100, 'Astrophysics');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> insert into ghc_faculty (faculty_id, surname, firstname, date_hired, date_fired, is_active, dept_no)
+  2  	 values (1001, 'Faulkner', 'Danny', '01-JAN-22', null, 1, 100);
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> insert into ghc_course (course_code, course_title, credits)
+  2  	 values ('APHY202', 'The Solar System', 5);
+
+1 row created.
+
+SQL> insert into ghc_course (course_code, course_title, credits)
+  2  	 values ('APHY203', 'Nebula', 5);
+
+1 row created.
+
+SQL> insert into ghc_course (course_code, course_title, credits)
+  2  	 values ('APHY204', 'Global Clusters', 5);
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> insert into ghc_expertise (faculty_id, course_code)
+  2  	 values(1001, 'APHY202');
+
+1 row created.
+
+SQL> insert into ghc_expertise (faculty_id, course_code)
+  2  	 values(1001, 'APHY203');
+
+1 row created.
+
+SQL> insert into ghc_expertise (faculty_id, course_code)
+  2  	 values(1001, 'APHY204');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from ghc_department;
+
+   DEPT_NO DEPT_NAME                                                            
+---------- --------------------                                                 
+       100 Astrophysics                                                         
+
+SQL> select * from ghc_course;
+
+COURSE_ COURSE_TITLE                                                    CREDITS 
+------- ------------------------------------------------------------ ---------- 
+APHY202 The Solar System                                                      5 
+APHY203 Nebula                                                                5 
+APHY204 Global Clusters                                                       5 
+
+SQL> select * from ghc_faculty;
+
+FACULTY_ID SURNAME                                                              
+---------- --------------------------------------------------                   
+FIRSTNAME                                          DATE_HIRE DATE_FIRE          
+-------------------------------------------------- --------- ---------          
+ IS_ACTIVE    DEPT_NO                                                           
+---------- ----------                                                           
+      1001 Faulkner                                                             
+Danny                                              01-JAN-22                    
+         1        100                                                           
+                                                                                
+
+SQL> select * from ghc_expertise;
+
+FACULTY_ID COURSE_                                                              
+---------- -------                                                              
+      1001 APHY202                                                              
+      1001 APHY203                                                              
+      1001 APHY204                                                              
+
+SQL> 
+SQL> 
+SQL> 
+SQL> insert into ghc_course (course_code, course_title, credits)
+  2  	 values ('APHY302', 'Nebula', 5);
+
+1 row created.
+
+SQL> 
+SQL> update ghc_expertise
+  2  set course_code = 'APHY302'
+  3  where course_code = 'APHY203';
+
+1 row updated.
+
+SQL> 
+SQL> 
+SQL> delete from ghc_course
+  2  where course_code = 'APHY203' and course_title = 'Nebula';
+
+1 row deleted.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from ghc_course;
+
+COURSE_ COURSE_TITLE                                                    CREDITS 
+------- ------------------------------------------------------------ ---------- 
+APHY202 The Solar System                                                      5 
+APHY204 Global Clusters                                                       5 
+APHY302 Nebula                                                                5 
+
+SQL> select * from ghc_expertise;
+
+FACULTY_ID COURSE_                                                              
+---------- -------                                                              
+      1001 APHY202                                                              
+      1001 APHY204                                                              
+      1001 APHY302                                                              
+
+SQL> 
+SQL> delete from ghc_expertise
+  2  where faculty_id=1001;
+
+3 rows deleted.
+
+SQL> 
+SQL> delete from ghc_faculty
+  2  where surname = 'Faulkner' and faculty_id = 1001;
+
+1 row deleted.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from ghc_course;
+
+COURSE_ COURSE_TITLE                                                    CREDITS 
+------- ------------------------------------------------------------ ---------- 
+APHY202 The Solar System                                                      5 
+APHY204 Global Clusters                                                       5 
+APHY302 Nebula                                                                5 
+
+SQL> select * from ghc_expertise;
+
+no rows selected
+
+SQL> 
+SQL> spool off

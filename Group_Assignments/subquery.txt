@@ -1,0 +1,116 @@
+SQL> 
+SQL> select state "ST", customer#, title
+  2  from customers join orders using(customer#)
+  3       join orderitems using(order#)
+  4       join books using(isbn)
+  5  where state not in 'TX' and title in
+  6      (select title
+  7      from customers join orders using(customer#)
+  8          join orderitems using(order#)
+  9          join books using(isbn)
+ 10      where state like 'TX')
+ 11  order by title;
+
+ST  CUSTOMER# TITLE                                                                                                     
+-- ---------- ------------------------------                                                                            
+FL       1015 BIG BEAR AND LITTLE DOVE                                                                                  
+MI       1017 BIG BEAR AND LITTLE DOVE                                                                                  
+IL       1011 DATABASE IMPLEMENTATION                                                                                   
+NJ       1019 DATABASE IMPLEMENTATION                                                                                   
+FL       1001 DATABASE IMPLEMENTATION                                                                                   
+FL       1001 DATABASE IMPLEMENTATION                                                                                   
+WY       1014 DATABASE IMPLEMENTATION                                                                                   
+FL       1003 E-BUSINESS THE EASY WAY                                                                                   
+MI       1017 REVENGE OF MICKEY                                                                                         
+GA       1018 REVENGE OF MICKEY                                                                                         
+WA       1005 REVENGE OF MICKEY                                                                                         
+
+11 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> select distinct title, state "ST"
+  2  from customers join orders using(customer#)
+  3       join orderitems using(order#)
+  4       join books using(isbn)
+  5  where isbn in
+  6      (select isbn
+  7      from customers join orders using(customer#)
+  8          join orderitems using(order#)
+  9          join books using(isbn)
+ 10      group by isbn
+ 11      having count(distinct state) =
+ 12          (select max(count(distinct state)) "Count"
+ 13          from customers join orders using(customer#)
+ 14              join orderitems using(order#)
+ 15              join books using(isbn)
+ 16          group by isbn))
+ 17  order by title, state;
+
+TITLE                          ST                                                                                       
+------------------------------ --                                                                                       
+COOKING WITH MUSHROOMS         FL                                                                                       
+COOKING WITH MUSHROOMS         ID                                                                                       
+COOKING WITH MUSHROOMS         NJ                                                                                       
+COOKING WITH MUSHROOMS         WA                                                                                       
+COOKING WITH MUSHROOMS         WY                                                                                       
+DATABASE IMPLEMENTATION        FL                                                                                       
+DATABASE IMPLEMENTATION        IL                                                                                       
+DATABASE IMPLEMENTATION        NJ                                                                                       
+DATABASE IMPLEMENTATION        TX                                                                                       
+DATABASE IMPLEMENTATION        WY                                                                                       
+
+10 rows selected.
+
+SQL> 
+SQL> 
+SQL> select distinct title
+  2  from customers join orders using(customer#)
+  3       join orderitems using(order#)
+  4       join books using(isbn)
+  5  where isbn = (
+  6      select isbn
+  7      from ( select isbn, sum(quantity) as quantity_ordered
+  8          from customers join orders using(customer#)
+  9               join orderitems using(order#)
+ 10               join books using(isbn)
+ 11               group by isbn)
+ 12      where quantity_ordered = (
+ 13          select max(quantity_ordered)
+ 14          from (select sum(quantity) as quantity_ordered
+ 15              from customers join orders using(customer#)
+ 16               join orderitems using(order#)
+ 17               join books using(isbn)
+ 18              group by isbn)));
+
+TITLE                                                                                                                   
+------------------------------                                                                                          
+COOKING WITH MUSHROOMS                                                                                                  
+
+SQL> 
+SQL> select distinct category, title, orderdate
+  2  from books join orderitems using(isbn)
+  3       join orders using(order#)
+  4  where (category, orderdate) in
+  5      (select category, max(orderdate)
+  6      from books join orderitems using(isbn)
+  7      join orders using(order#)
+  8      group by category)
+  9  order by category, title;
+
+CATEGORY     TITLE                          ORDERDATE                                                                   
+------------ ------------------------------ ---------                                                                   
+BUSINESS     HOW TO MANAGE THE MANAGER      31-MAR-09                                                                   
+CHILDREN     BIG BEAR AND LITTLE DOVE       04-APR-09                                                                   
+COMPUTER     DATABASE IMPLEMENTATION        05-APR-09                                                                   
+COOKING      COOKING WITH MUSHROOMS         05-APR-09                                                                   
+FAMILY LIFE  REVENGE OF MICKEY              05-APR-09                                                                   
+FITNESS      BODYBUILD IN 10 MINUTES A DAY  01-APR-09                                                                   
+LITERATURE   SHORTEST POEMS                 01-APR-09                                                                   
+
+7 rows selected.
+
+SQL> 
+SQL> spool off

@@ -1,0 +1,230 @@
+SQL> rem set language to english to avoid problems with non-english machines
+SQL> alter session set NLS_LANGUAGE = ENGLISH;
+
+Session altered.
+
+SQL> 
+SQL> DROP TABLE hn_entertainerGig;
+DROP TABLE hn_entertainerGig
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_entertainerMusicalStyles;
+DROP TABLE hn_entertainerMusicalStyles
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_entertainer;
+DROP TABLE hn_entertainer
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_client;
+DROP TABLE hn_client
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_agent;
+DROP TABLE hn_agent
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_manager;
+DROP TABLE hn_manager
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_type;
+DROP TABLE hn_type
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE hn_musicalStyles;
+DROP TABLE hn_musicalStyles
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> REM Question 2 CREATE TABLE at column level
+SQL> CREATE TABLE hn_type
+  2  (entertainerTypeID NUMBER CONSTRAINT SYS_TYPE_PK PRIMARY KEY,
+  3   description VARCHAR2(50) CONSTRAINT SYS_TYPE_DESC_NN NOT NULL);
+
+Table created.
+
+SQL> 
+SQL>  CREATE TABLE hn_manager
+  2  (managerID NUMBER CONSTRAINT SYS_MGR_PK PRIMARY KEY,
+  3   firstname VARCHAR2(25) NOT NULL,
+  4   lastname VARCHAR2(25) NOT NULL,
+  5   busname VARCHAR2(50) NOT NULL,
+  6   homephone CHAR(12) CONSTRAINT SYS_MGT_HOME_PHONE_CK
+  7  	  CHECK ( REGEXP_LIKE (homePhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}')),
+  8   busphone CHAR(12) NOT NULL
+  9  	CONSTRAINT SYS_MGT_BUS_PHONE_CK
+ 10  	  CHECK ( REGEXP_LIKE (busPhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}')),
+ 11   email VARCHAR2(60) NOT NULL
+ 12  	 CONSTRAINT SYS_MGR_EMAIL_UK UNIQUE
+ 13  );
+
+Table created.
+
+SQL> 
+SQL> rem create table at table level
+SQL> 
+SQL> CREATE TABLE hn_entertainer
+  2  (entertainerID NUMBER CONSTRAINT SYS_ENTERTAIN_PK PRIMARY KEY,
+  3   entertainerTypeID NUMBER CONSTRAINT SYS_ENTERTAIN_TYPE_FK REFERENCES hn_TYPE(entertainerTypeID)
+  4  	     NOT NULL,
+  5   managerID NUMBER CONSTRAINT SYS_ENTERTAIN_MGR_FK REFERENCES hn_manager(managerID)
+  6  	     NOT NULL,
+  7   firstName VARCHAR2(25) NOT NULL,
+  8   lastName VARCHAR2(25)  NOT NULL,
+  9   stageName VARCHAR2(50) NOT NULL,
+ 10   eventType VARCHAR2(50),
+ 11   homePhone CHAR(12) CONSTRAINT SYS_ENT_HOME_PHONE_CK
+ 12  	  CHECK ( REGEXP_LIKE (homePhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}')),
+ 13   busPhone CHAR(12)  CONSTRAINT SYS_ENTERTAIN_BPHONE_NN NOT NULL
+ 14  	  CONSTRAINT SYS_ENT_BUS_PHONE_CK
+ 15  	    CHECK ( REGEXP_LIKE (busPhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}')),
+ 16   email VARCHAR2(60)  NOT NULL
+ 17  	 CONSTRAINT SYS_ENTERTAIN_EMAIL_UK UNIQUE
+ 18  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE hn_musicalStyles
+  2  (styleID NUMBER CONSTRAINT SYS_MS_PK PRIMARY KEY,
+  3   description VARCHAR2(50) NOT NULL);
+
+Table created.
+
+SQL> 
+SQL>  CREATE TABLE hn_entertainerMusicalStyles
+  2  (styleID NUMBER,
+  3   entertainerID NUMBER,
+  4   CONSTRAINT SYS_ENTSTYLES_PK PRIMARY KEY (styleid, entertainerID),
+  5   CONSTRAINT SYS_MSTYLE_ENTMSTYLE_FK FOREIGN KEY (styleID) REFERENCES hn_musicalStyles(styleID),
+  6   CONSTRAINT SYS_ENT_ENTMSTYLE_FK FOREIGN KEY (entertainerID) REFERENCES hn_entertainer(entertainerID)
+  7  );
+
+Table created.
+
+SQL> 
+SQL> rem basic create table, add constraints afterwards using alter table
+SQL> 
+SQL> -- agent table
+SQL> CREATE TABLE hn_agent
+  2  (agentID NUMBER,
+  3   firstName VARCHAR2(25),
+  4   lastName VARCHAR2(25),
+  5   hireDate DATE,
+  6   busPhone CHAR(12),
+  7   homePhone CHAR(12),
+  8   email VARCHAR2(60));
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> ALTER TABLE hn_agent
+  2   MODIFY firstName NOT NULL
+  3   MODIFY lastName  NOT NULL
+  4   MODIFY busPhone NOT NULL
+  5   MODIFY email NOT NULL;
+
+Table altered.
+
+SQL> 
+SQL> ALTER TABLE hn_agent
+  2   ADD CONSTRAINT SYS_AGT_BUS_PHONE_CK
+  3  	    CHECK ( REGEXP_LIKE (busPhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}'))
+  4   ADD CONSTRAINT SYS_AGT_HOME_PHONE_CK
+  5  	    CHECK ( REGEXP_LIKE (homePhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}'))
+  6   ADD CONSTRAINT SYS_AGT_PK PRIMARY KEY (agentid)
+  7   ADD CONSTRAINT SYS_AGT_EMAIL_UK UNIQUE (email);
+
+Table altered.
+
+SQL> 
+SQL> -- client table
+SQL> 
+SQL> CREATE TABLE hn_client
+  2  (clientID NUMBER,
+  3   agentID NUMBER,
+  4   firstName VARCHAR2(25),
+  5   lastName VARCHAR2(25),
+  6   homePhone CHAR(12),
+  7   busPhone CHAR(12),
+  8   email VARCHAR2(60)
+  9  );
+
+Table created.
+
+SQL> 
+SQL> ALTER TABLE hn_client
+  2   MODIFY firstName NOT NULL
+  3   MODIFY agentID NOT NULL
+  4   MODIFY lastName NOT NULL
+  5   MODIFY busPhone NOT NULL
+  6   MODIFY email NOT NULL;
+
+Table altered.
+
+SQL> 
+SQL> ALTER TABLE hn_client
+  2   ADD CONSTRAINT SYS_CLIENT_HOME_PHONE_CK
+  3  	    CHECK ( REGEXP_LIKE (homePhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}'))
+  4   ADD CONSTRAINT SYS_CLIENT_BUS_PHONE_CK
+  5  	    CHECK ( REGEXP_LIKE (busPhone, '[1-9]([0-9]){2}[.]([0-9]){3}[.]([0-9]){4}'))
+  6   ADD CONSTRAINT SYS_CLIENT_PK PRIMARY KEY (clientID)
+  7   ADD CONSTRAINT SYS_CLIENT_AGT_FK FOREIGN KEY (agentID)
+  8  	REFERENCES hn_agent(agentid)
+  9   ADD CONSTRAINT SYS_CLIENT_EMAIL_UK UNIQUE (email);
+
+Table altered.
+
+SQL> 
+SQL> CREATE TABLE hn_entertainerGig
+  2  (entertainerID NUMBER,
+  3   clientID NUMBER,
+  4   startDate DATE,
+  5   clientFee NUMBER(7,2),
+  6   entertainerFee NUMBER(7,2),
+  7   street VARCHAR2(50) NOT NULL,
+  8   city VARCHAR2(25) NOT NULL,
+  9   prov CHAR(2) NOT NULL,
+ 10   postalCode CHAR(6) NOT NULL,
+ 11   CONSTRAINT SYS_ENTGIG_PK PRIMARY KEY (entertainerID, clientID, startDate),
+ 12   CONSTRAINT SYS_ENTGIG_ENT_FK FOREIGN KEY (entertainerID)
+ 13    REFERENCES hn_entertainer(entertainerID),
+ 14   CONSTRAINT SYS_ENTGIG_CLT_FK FOREIGN KEY (clientID)
+ 15    REFERENCES hn_client(clientID),
+ 16   CONSTRAINT SYS_ENTGIG_FEES_CK CHECK (clientFee >= entertainerFee),
+ 17   CONSTRAINT SYS_ENTGIG_PROV_CK CHECK (UPPER(prov) in ('AB',
+ 18  	'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC',
+ 19  	'SK', 'YT')),
+ 20   CONSTRAINT SYS_EG_POSTAL_CK
+ 21  	 CHECK (REGEXP_LIKE (postalCode, '([A-Z][0-9]){3}'))
+ 22  );
+
+Table created.
+
+SQL> 
+SQL> spool off

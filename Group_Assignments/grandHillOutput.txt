@@ -1,0 +1,86 @@
+SQL> set echo on
+SQL> 
+SQL> --drop child tables followed by parent tables
+SQL> drop table ghc_expertise;
+drop table ghc_expertise
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table ghc_faculty;
+drop table ghc_faculty
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> drop table ghc_department;
+
+Table dropped.
+
+SQL> drop table ghc_course;
+
+Table dropped.
+
+SQL> 
+SQL> --create parent tables, then child tables
+SQL> create table ghc_course(
+  2  	 course_code char(7) constraint sys_ghc_course_pk primary key,
+  3  	 course_title varchar2(60) not null,
+  4  	 credits number(2) not null constraint sys_ghc_course_credits_ck
+  5  	     check(credits between 1 and 9)
+  6  );
+
+Table created.
+
+SQL> 
+SQL> create table ghc_department(
+  2  	 dept_no number,
+  3  	 dept_name varchar2(20)
+  4  );
+
+Table created.
+
+SQL> 
+SQL> alter table ghc_department
+  2  	 add constraint sys_ghc_department_pk primary key(dept_no)
+  3  	 add constraint sys_ghc_dept_name_uk unique(dept_name);
+
+Table altered.
+
+SQL> alter table ghc_department
+  2  	 modify(dept_name not null);
+
+Table altered.
+
+SQL> 
+SQL> create table ghc_faculty(
+  2  	 faculty_id number constraint sys_ghc_faculty_pk primary key,
+  3  	 surname varchar2(50) not null,
+  4  	 firstname varchar2(50) not null,
+  5  	 date_hired date not null,
+  6  	 date_fired date,
+  7  	 is_active number(1) not null constraint sys_ghc_fac_active_ck
+  8  	     check (is_active in (0, 1)),
+  9  	 dept_no number constraint sys_ghc_dept_faculty_fk
+ 10  	     references ghc_department(dept_no) not null
+ 11  );
+
+Table created.
+
+SQL> 
+SQL> create table ghc_expertise(
+  2  	 faculty_id number,
+  3  	 course_code char(7),
+  4  	 constraint sys_ghc_expertise_pk primary key(faculty_id, course_code),
+  5  	 constraint sys_ghc_fac_expertise_fk foreign key(faculty_id)
+  6  	     references ghc_faculty(faculty_id),
+  7  	 constraint sys_ghc_course_expertise_fk foreign key(course_code)
+  8  	     references ghc_course(course_code)
+  9  );
+
+Table created.
+
+SQL> 
+SQL> spool off

@@ -1,0 +1,109 @@
+SQL> 
+SQL> 
+SQL> 
+SQL> select tour_description, to_char(sum(price), '$9,999.00') "Price"
+  2  from rcv_destination join rcv_tour_destination using (dest_code)
+  3  	  join rcv_vacation_tour using (tour_code)
+  4  having sum(price) =
+  5  	 (select max(sum(price))
+  6  	  from rcv_destination join rcv_tour_destination using (dest_code)
+  7  	  join rcv_vacation_tour using (tour_code)
+  8  	  group by tour_code)
+  9  group by tour_description;
+
+TOUR_DESCRIPTION                                   Price                                                                
+-------------------------------------------------- ----------                                                           
+Palm Springs Adventure                              $1,390.45                                                           
+
+SQL> 
+SQL> 
+SQL> select tour_description, to_char(sum(price), '$9,999.00') "Price"
+  2  from rcv_destination join rcv_tour_destination using(dest_code)
+  3  	  join rcv_vacation_tour using (tour_code)
+  4  where tour_region = 'EU' and tour_description in
+  5  	 (select tour_description
+  6  	 from rcv_destination join rcv_tour_destination using(dest_code)
+  7  	      join rcv_vacation_tour using (tour_code)
+  8  	 group by tour_description
+  9  	 having sum(price) > any
+ 10  	     (select sum(price)
+ 11  	     from rcv_destination join rcv_tour_destination using(dest_code)
+ 12  	     join rcv_vacation_tour using (tour_code)
+ 13  	     where tour_region = 'CA'
+ 14  	     group by tour_description))
+ 15  group by tour_description;
+
+TOUR_DESCRIPTION                                   Price                                                                
+-------------------------------------------------- ----------                                                           
+Paris Culture Tour                                    $792.90                                                           
+France in 4 Days                                      $748.41                                                           
+European Vacation                                   $1,299.47                                                           
+Sights of Barcelona                                   $917.43                                                           
+
+SQL> 
+SQL> 
+SQL> Column dest_description format A85
+SQL> Column 'Price' format A12
+SQL> select dest_description, to_char(price, '$9,999.00') "Price"
+  2  from rcv_destination
+  3  where price <
+  4  	 (select avg(avg(price)) Average
+  5  	 from rcv_destination
+  6  	 group by dest_description);
+
+DEST_DESCRIPTION                                                                      Price                             
+------------------------------------------------------------------------------------- ------------                      
+Skip the Line Ticket: Eiffel Tower Summit Priority Access with Host                      $102.99                        
+Gourmet Dinner & Sightseeing Cruise                                                      $114.99                        
+Bateaux Parisiens Seine River Cruise                                                      $75.75                        
+Bateaux Parisiens Seine River Gourmet Dinner & Sightseeing Cruise                        $162.73                        
+Disneyland Paris 1-Day Ticket                                                             $76.90                        
+French Riviera in One Day                                                                 $89.26                        
+Nice Small-Group Walking Food Tour with Local Specialties & Wine Tasting                  $96.13                        
+Nice Local Vineyards Small Group Half Day E-Bike Tour with Wine Tasting                  $109.86                        
+French Riviera Famous Cities Scoot Coupe Self Drive Tour from Nice                        $96.13                        
+Interactive Spanish Cooking Experience in Barcelona                                       $72.76                        
+Girona and Dali Museum Small Group Tour with Hotel Pick-up from Barcelona                $136.76                        
+Sunset Jazz Cruise in Barcelona                                                           $49.95                        
+Modern & More Bike Tours Palm Springs                                                     $49.95                        
+Earthquake Canyon Express Downhill Bicycle Adventure                                     $157.63                        
+Palm Springs Windmill Tours                                                               $69.23                        
+Private French-Inspired Cooking Class with a Fun Local in Palm Springs, CA               $139.24                        
+Private Surf Lesson Newport Beach, California                                            $179.55                        
+Lake Louise & Yoho N.P & Moraine Lake 1-Day Tour from Calgary or Banff                   $146.32                        
+Calgary Stampede - Day pass Rodeo                                                        $131.00                        
+2-Hour Horseback Trail Ride in Kananaskis                                                $131.25                        
+Voyageur Canoe Tour                                                                       $63.00                        
+Blackshale Suspension Bridge & Sightseeing Tour                                          $155.00                        
+Heritage Park - the 1883 experience                                                       $79.99                        
+Cycling the Bow                                                                           $39.94                        
+Familia Sagrada Guided Tour                                                               $70.03                        
+Rock climbing at COP                                                                      $59.95                        
+Sulfur Mountain Gondola and Banff Hot Springs                                            $121.00                        
+Palm Springs On/Off City Tour                                                             $29.95                        
+Palm Springs Art Museum Guided Tour                                                       $39.95                        
+
+29 rows selected.
+
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> 
+SQL> select distinct first_name, last_name
+  2  from rcv_customer join rcv_tour_customer using(customer_number)
+  3  where tour_code not in
+  4  	 (select tour_code
+  5  	 from rcv_agent a join rcv_customer using(agent_id)
+  6  	     join rcv_tour_customer using (customer_number)
+  7  	 where a.first_name = 'Ethan' and a.last_name = 'Hunt');
+
+FIRST_NAME                     LAST_NAME                                                                                
+------------------------------ ------------------------------                                                           
+Bernadette                     Rostenkowski-Wolowitz                                                                    
+Raj                            Koothrappali                                                                             
+Amy                            Folwer                                                                                   
+Lionel                         Messie                                                                                   
+
+SQL> 
+SQL> 
+SQL> spool off

@@ -1,0 +1,138 @@
+SQL> 
+SQL> 
+SQL> column 'Desc' format A25
+SQL> column 'Start Date' format A25
+SQL> column 'Dest Desc' format A15
+SQL> column 'Duration' format A10
+SQL> break on 'Desc' on 'Start Date' on 'Duration'
+SQL> 
+SQL> select
+  2  	 initcap(tour_description) "Desc", to_char(start_date, 'MON dd, yyyy') "Start Date",
+  3  	 concat(end_date - start_date, ' Days') "Duration",
+  4  	 order# "Num",
+  5  	 substr(dest_description,1,15) as "Dest Desc",
+  6  	 to_char(price, '$9,999.00') "Price"
+  7  from rcv_customer c join rcv_tour_customer using(customer_number)
+  8  	 join rcv_vacation_tour using(tour_code)
+  9  	 join rcv_tour_destination using(tour_code)
+ 10  	 join rcv_destination using(dest_code)
+ 11  where lower(first_name) = 'amy' and lower(last_name) ='folwer'
+ 12  order by tour_description, order#;
+
+Desc                      Start Date                Duration          Num Dest Desc       Price                         
+------------------------- ------------------------- ---------- ---------- --------------- ----------                    
+Calgary Highlights        AUG 08, 2022              4 Days              1 Calgary City Si    $214.36                    
+                                                                        2 Sulfur Mountain    $121.00                    
+                                                                        3 Heritage Park -     $79.99                    
+Calgary Stampede          JUL 08, 2022              9 Days              1 Calgary Stamped    $251.00                    
+                                                                        2 Calgary Stamped    $131.00                    
+                                                                        3 Calgary City Si    $214.36                    
+European Vacation         JUL 10, 2022              14 Days             1 Skip the Line T    $102.99                    
+                                                                        2 Normandy D-Day     $439.43                    
+                                                                        3 French Riviera      $89.26                    
+                                                                        4 360 degree Barc    $597.76                    
+                                                                        5 Familia Sagrada     $70.03                    
+France In 4 Days          AUG 23, 2022              3 Days              1 Skip the Line T    $102.99                    
+                                                                        2 Normandy D-Day     $439.43                    
+                                                                        3 Nice Small-Grou     $96.13                    
+                                                                        4 Nice Local Vine    $109.86                    
+Sights Of Barcelona       AUG 28, 2022              7 Days              1 Barcelona in On    $196.96                    
+                                                                        2 360 degree Barc    $597.76                    
+                                                                        3 Sunset Jazz Cru     $49.95                    
+                                                                        4 Interactive Spa     $72.76                    
+
+19 rows selected.
+
+SQL> 
+SQL> clear columns
+SQL> clear breaks
+SQL> 
+SQL> column 'Desc' format A40
+SQL> column 'Cost' format A5
+SQL> column 'Country' format A20
+SQL> column 'City' format A15
+SQL> 
+SQL> select dest_description "Desc",
+  2  	 case when price < 50 then '$'
+  3  	    when price between 50 and 100 then '$$'
+  4  	    when price between 100 and 200 then '$$$'
+  5  	    when price between 200 and 500 then '$$$$'
+  6  	    else '$$$$$' end as "Cost",
+  7  	 upper(country) "Country",
+  8  	 city "City"
+  9  from rcv_destination
+ 10  where country not in ('Canada', 'United States')
+ 11  order by country, city, "Cost";
+
+Desc                                     Cost  Country              City                                                
+---------------------------------------- ----- -------------------- ---------------                                     
+Nice Small-Group Walking Food Tour with  $$    FRANCE               Nice                                                
+Local Specialties & Wine Tasting                                                                                        
+                                                                                                                        
+French Riviera in One Day                $$    FRANCE               Nice                                                
+French Riviera Famous Cities Scoot Coupe $$    FRANCE               Nice                                                
+ Self Drive Tour from Nice                                                                                              
+                                                                                                                        
+Nice Local Vineyards Small Group Half Da $$$   FRANCE               Nice                                                
+y E-Bike Tour with Wine Tasting                                                                                         
+                                                                                                                        
+Bateaux Parisiens Seine River Cruise     $$    FRANCE               Paris                                               
+Disneyland Paris 1-Day Ticket            $$    FRANCE               Paris                                               
+Bateaux Parisiens Seine River Gourmet Di $$$   FRANCE               Paris                                               
+nner & Sightseeing Cruise                                                                                               
+                                                                                                                        
+Skip the Line Ticket: Eiffel Tower Summi $$$   FRANCE               Paris                                               
+t Priority Access with Host                                                                                             
+                                                                                                                        
+Gourmet Dinner & Sightseeing Cruise      $$$   FRANCE               Paris                                               
+Normandy D-Day Beaches & American Cemete $$$$  FRANCE               Paris                                               
+ry Trip from Paris                                                                                                      
+                                                                                                                        
+Sunset Jazz Cruise in Barcelona          $     SPAIN                Barcelona                                           
+Familia Sagrada Guided Tour              $$    SPAIN                Barcelona                                           
+Interactive Spanish Cooking Experience i $$    SPAIN                Barcelona                                           
+n Barcelona                                                                                                             
+                                                                                                                        
+Barcelona in One Day: Sagrada Familia, P $$$   SPAIN                Barcelona                                           
+ark Guell & Old Town with Hotel Pick-up                                                                                 
+                                                                                                                        
+Girona and Dali Museum Small Group Tour  $$$   SPAIN                Barcelona                                           
+with Hotel Pick-up from Barcelona                                                                                       
+                                                                                                                        
+360 degree Barcelona SkyWalk: Old Town W $$$$$ SPAIN                Barcelona                                           
+alking, Helicopter flight & Sailing Smal                                                                                
+l Group                                                                                                                 
+                                                                                                                        
+
+16 rows selected.
+
+SQL> 
+SQL> clear columns
+SQL> 
+SQL> column 'Desc' format A80
+SQL> column 'Country' format A25
+SQL> column 'State' format A10
+SQL> select dest_description "Desc",
+  2  	    decode(initcap(country), 'United States', 'USA', initcap(country)) "Country",
+  3  	    nvl(upper(state), 'NA') AS "State"
+  4  from rcv_destination r
+  5  where
+  6  	 instr(lower(dest_description), 'cook') > 0 or
+  7  	 instr(lower(dest_description), 'wine') > 0 or
+  8  	 instr(lower(dest_description), 'dinner') > 0;
+
+Desc                                                                             Country                   State        
+-------------------------------------------------------------------------------- ------------------------- ----------   
+Gourmet Dinner & Sightseeing Cruise                                              France                    NA           
+Bateaux Parisiens Seine River Gourmet Dinner & Sightseeing Cruise                France                    NA           
+Nice Small-Group Walking Food Tour with Local Specialties & Wine Tasting         France                    NA           
+Nice Local Vineyards Small Group Half Day E-Bike Tour with Wine Tasting          France                    NA           
+Interactive Spanish Cooking Experience in Barcelona                              Spain                     NA           
+Private French-Inspired Cooking Class with a Fun Local in Palm Springs, CA       USA                       CA           
+
+6 rows selected.
+
+SQL> 
+SQL> clear columns
+SQL> 
+SQL> spool off

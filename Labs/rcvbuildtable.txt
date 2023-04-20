@@ -1,0 +1,214 @@
+SQL> 
+SQL> DROP TABLE rcv_tour_destination cascade constraints;
+DROP TABLE rcv_tour_destination cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_tour_customer cascade constraints;
+DROP TABLE rcv_tour_customer cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_agent_training cascade constraints;
+DROP TABLE rcv_agent_training cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_destination cascade constraints;
+DROP TABLE rcv_destination cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_vacation_tour cascade constraints;
+DROP TABLE rcv_vacation_tour cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_rating cascade constraints;
+DROP TABLE rcv_rating cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_training cascade constraints;
+DROP TABLE rcv_training cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_customer cascade constraints;
+DROP TABLE rcv_customer cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> DROP TABLE rcv_agent cascade constraints;
+DROP TABLE rcv_agent cascade constraints
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> 
+SQL> -- Create the tables and constraints.
+SQL> -- Note:  Answers may vary based on how the constraint are constructed.
+SQL> 
+SQL> 
+SQL> CREATE TABLE rcv_destination
+  2  (dest_code NUMBER,
+  3   dest_description VARCHAR2(100),
+  4   city VARCHAR2(50) CONSTRAINT DEST_CITY_NN NOT NULL,
+  5   country VARCHAR2(50) CONSTRAINT DEST_COUNTRY_NN NOT NULL,
+  6   state char(2),
+  7   price NUMBER(10,2) NOT NULL,
+  8   CONSTRAINT DEST_COUNTRY_CK CHECK (state in ('BC', 'AB', 'SK', 'MB', 'ON', 'QC', 'NB',
+  9  	 'NS', 'NL', 'NU', 'PE', 'YT') OR upper(country) != 'CANADA')
+ 10  );
+
+Table created.
+
+SQL> 
+SQL> rem add a primary key using a alter table
+SQL> ALTER TABLE rcv_destination
+  2    ADD CONSTRAINT destination_pk PRIMARY KEY (dest_code);
+
+Table altered.
+
+SQL> 
+SQL> CREATE TABLE rcv_rating
+  2  (rating_code CHAR(1) CONSTRAINT rating_pk PRIMARY KEY,
+  3   rating_description VARCHAR2(50) CONSTRAINT RATING_DESC_NN NOT NULL
+  4  );
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> CREATE TABLE rcv_vacation_tour
+  2  (tour_code NUMBER,
+  3   tour_description VARCHAR2(50),
+  4   tour_region VARCHAR2(2) CONSTRAINT t_region_ck
+  5  	 CHECK (tour_region IN ('CA', 'US', 'EU')),
+  6   rating_code CHAR(1),
+  7   CONSTRAINT vt_pk PRIMARY KEY (tour_code)
+  8  );
+
+Table created.
+
+SQL> 
+SQL> ALTER TABLE rcv_vacation_tour
+  2    MODIFY tour_region CONSTRAINT tr_nn NOT NULL
+  3    MODIFY tour_description CONSTRAINT tour_desc_nn NOT NULL
+  4    ADD CONSTRAINT vt_to_rating_fk FOREIGN KEY(rating_code)
+  5  	 REFERENCES rcv_rating(rating_code)
+  6    MODIFY rating_code CONSTRAINT tour_rating_code_nn NOT NULL;
+
+Table altered.
+
+SQL> 
+SQL> rem creating bridging table, notice the use of a table constraint
+SQL> rem to create a composite PK
+SQL> CREATE TABLE rcv_tour_destination
+  2  ( tour_code NUMBER CONSTRAINT td_to_vt_fk
+  3  	REFERENCES rcv_vacation_tour(tour_code),
+  4   dest_code NUMBER,
+  5   CONSTRAINT td_pk PRIMARY KEY(dest_code, tour_code),
+  6   CONSTRAINT td_to_dest_fk FOREIGN KEY(dest_code)
+  7  	REFERENCES rcv_destination(dest_code),
+  8   order# NUMBER(2)
+  9  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE rcv_agent
+  2  (agent_id NUMBER CONSTRAINT agent_pk PRIMARY KEY,
+  3   first_name VARCHAR2(10) NOT NULL,
+  4   last_name VARCHAR2(10) CONSTRAINT a_last_name_nn NOT NULL,
+  5   agent_level VARCHAR2(4)
+  6  	 CONSTRAINT agent_level_ck CHECK (agent_level IN ('I', 'II', 'III', 'IV', 'V'))
+  7  	     NOT NULL,
+  8   agent_speciality VARCHAR2(10)
+  9  	 CONSTRAINT agent_speciality_ck CHECK (agent_speciality in ('CA', 'US', 'EU'))
+ 10  	     NOT NULL,
+ 11   years_experience NUMBER(2)
+ 12  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE rcv_customer
+  2  (customer_number NUMBER,
+  3   first_name VARCHAR2(30) NOT NULL,
+  4   last_name VARCHAR2(30) NOT NULL,
+  5   customer_phone VARCHAR2(12) NOT NULL,
+  6   customer_street_address VARCHAR2(20) NOT NULL,
+  7   customer_city VARCHAR2(15) NOT NULL,
+  8   customer_province VARCHAR2(2),
+  9   agent_id NUMBER NOT NULL
+ 10  );
+
+Table created.
+
+SQL> rem example of adding the PK and FK AFTER table creation using ALTER TABLE
+SQL> ALTER TABLE rcv_customer
+  2    ADD CONSTRAINT customer_pk PRIMARY KEY (customer_number)
+  3    ADD CONSTRAINT cust_to_agent_fk FOREIGN KEY(agent_id)
+  4  	  REFERENCES rcv_agent(agent_id);
+
+Table altered.
+
+SQL> 
+SQL> CREATE TABLE rcv_tour_customer
+  2  (tour_code NUMBER CONSTRAINT tc_to_vt_fk
+  3  				      REFERENCES rcv_vacation_tour(tour_code),
+  4   customer_number NUMBER CONSTRAINT tc_to_cust_fk
+  5  				      REFERENCES rcv_customer(customer_number),
+  6   start_date DATE,
+  7   end_date DATE
+  8  );
+
+Table created.
+
+SQL> rem add composite PK using an ALTER TABLE command
+SQL> ALTER TABLE rcv_tour_customer
+  2    ADD CONSTRAINT tc_pk PRIMARY KEY (tour_code, customer_number);
+
+Table altered.
+
+SQL> 
+SQL> CREATE TABLE rcv_training
+  2  (training_code NUMBER CONSTRAINT training_pk PRIMARY KEY,
+  3   training_description VARCHAR2(50),
+  4   duration_hours NUMBER(2)
+  5  );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE rcv_agent_training
+  2  (agent_id NUMBER CONSTRAINT at_to_agent_fk
+  3  				      REFERENCES rcv_agent(agent_id),
+  4   training_code NUMBER CONSTRAINT at_to_training_fk
+  5  				      REFERENCES rcv_training(training_code),
+  6   date_completed DATE,
+  7   CONSTRAINT at_pk PRIMARY KEY(agent_id, training_code)
+  8  );
+
+Table created.
+
+SQL> 
+SQL> spool off
